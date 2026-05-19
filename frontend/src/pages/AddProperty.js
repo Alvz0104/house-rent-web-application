@@ -1,5 +1,13 @@
-import { useState } from "react";
+import { 
+    useState 
+} from "react";
+
 import axios from "axios";
+
+import {
+    Container,
+    Form
+} from "react-bootstrap";
 
 function AddProperty() {
 
@@ -15,6 +23,12 @@ function AddProperty() {
 
     const [image, setImage] = useState(null);
 
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState("");
+
+    const [success, setSuccess] = useState("");
+
     const handleChange = (e) => {
 
         setFormData({
@@ -22,11 +36,20 @@ function AddProperty() {
             [e.target.name]: e.target.value
         });
 
+        setError("");
+
     };
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
+
+        if (!image) {
+            setError("Please upload a property image");
+            return;
+        }
+
+        setLoading(true);
 
         try {
 
@@ -56,92 +79,185 @@ function AddProperty() {
                 }
             );
 
-            alert(res.data.message);
+            setSuccess(res.data.message);
+
+            setFormData({
+                title: "",
+                description: "",
+                price: "",
+                location: "",
+                bedrooms: "",
+                bathrooms: "",
+                amenities: ""
+            });
+
+            setImage(null);
 
         } catch (error) {
 
-            alert(error.response.data.message);
+            setError(error.response?.data?.message || "Failed to add property");
 
+        } finally {
+            setLoading(false);
         }
 
     };
 
     return (
 
-        <div className="container mt-5">
+        <div style={{background: '#F7F7F7', minHeight: '100vh', paddingTop: '40px', paddingBottom: '40px'}}>
 
-            <h2>Add Property</h2>
+            <Container style={{maxWidth: '600px'}}>
 
-            <form onSubmit={handleSubmit}>
+                <div style={{background: 'white', borderRadius: '12px', padding: '32px', boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'}}>
 
-                <input
-                    type="text"
-                    name="title"
-                    placeholder="Title"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                    <h2 style={{fontSize: '1.8rem', fontWeight: '700', marginBottom: '32px'}}>
+                        List Your Property
+                    </h2>
 
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                    {error && (
+                        <div style={{
+                            background: '#FFE5E5',
+                            color: '#C5192D',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            marginBottom: '16px',
+                            fontSize: '0.85rem'
+                        }}>
+                            {error}
+                        </div>
+                    )}
 
-                <input
-                    type="number"
-                    name="price"
-                    placeholder="Price"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                    {success && (
+                        <div style={{
+                            background: '#E8F5E9',
+                            color: '#31A24C',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            marginBottom: '16px',
+                            fontSize: '0.85rem'
+                        }}>
+                            {success}
+                        </div>
+                    )}
 
-                <input
-                    type="text"
-                    name="location"
-                    placeholder="Location"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                    <form onSubmit={handleSubmit}>
 
-                <input
-                    type="number"
-                    name="bedrooms"
-                    placeholder="Bedrooms"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Property Title</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="title"
+                                placeholder="Modern apartment in the city"
+                                onChange={handleChange}
+                                value={formData.title}
+                                required
+                            />
+                        </Form.Group>
 
-                <input
-                    type="number"
-                    name="bathrooms"
-                    placeholder="Bathrooms"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Description</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="description"
+                                placeholder="Tell guests about your property..."
+                                rows={4}
+                                onChange={handleChange}
+                                value={formData.description}
+                                required
+                            />
+                        </Form.Group>
 
-                <input
-                    type="text"
-                    name="amenities"
-                    placeholder="Amenities"
-                    className="form-control mb-3"
-                    onChange={handleChange}
-                />
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Monthly Price (₱)</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="price"
+                                placeholder="25000"
+                                onChange={handleChange}
+                                value={formData.price}
+                                required
+                            />
+                        </Form.Group>
 
-                <input
-                    type="file"
-                    className="form-control mb-3"
-                    onChange={(e) =>
-                        setImage(e.target.files[0])
-                    }
-                />
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Location</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="location"
+                                placeholder="Manila, Philippines"
+                                onChange={handleChange}
+                                value={formData.location}
+                                required
+                            />
+                        </Form.Group>
 
-                <button className="btn btn-primary">
-                    Add Property
-                </button>
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Bedrooms</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="bedrooms"
+                                placeholder="2"
+                                onChange={handleChange}
+                                value={formData.bedrooms}
+                                required
+                            />
+                        </Form.Group>
 
-            </form>
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Bathrooms</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="bathrooms"
+                                placeholder="1"
+                                onChange={handleChange}
+                                value={formData.bathrooms}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Amenities</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="amenities"
+                                placeholder="WiFi, Kitchen, AC, TV"
+                                onChange={handleChange}
+                                value={formData.amenities}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-4">
+                            <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Property Image</Form.Label>
+                            <Form.Control
+                                type="file"
+                                onChange={(e) => {
+                                    setImage(e.target.files[0]);
+                                    setError("");
+                                }}
+                            />
+                            <small style={{color: '#717171'}}>Upload a clear photo of your property</small>
+                        </Form.Group>
+
+                        <button 
+                            type="submit"
+                            className="custom-btn w-100"
+                            style={{
+                                padding: '12px',
+                                fontSize: '1rem',
+                                fontWeight: '600'
+                            }}
+                            disabled={loading}
+                        >
+                            {loading ? 'Publishing...' : 'Publish Property'}
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </Container>
 
         </div>
 

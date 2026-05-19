@@ -5,8 +5,13 @@ import {
 import axios from "axios";
 
 import {
-    useNavigate
+    useNavigate,
+    Link
 } from "react-router-dom";
+
+import {
+    Form
+} from "react-bootstrap";
 
 function Register() {
 
@@ -26,6 +31,10 @@ function Register() {
 
     });
 
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState("");
+
     const handleChange = (e) => {
 
         setFormData({
@@ -37,12 +46,16 @@ function Register() {
 
         });
 
+        setError("");
+
     };
 
     const handleSubmit =
     async (e) => {
 
         e.preventDefault();
+
+        setLoading(true);
 
         try {
 
@@ -61,81 +74,116 @@ function Register() {
 
         } catch (error) {
 
-            alert(
-                error.response.data.message
-            );
+            setError(error.response?.data?.message || "Registration failed. Please try again.");
 
+        } finally {
+            setLoading(false);
         }
 
     };
 
     return (
 
-        <div className="container mt-5">
+        <div className="auth-container">
 
-            <h2>Register</h2>
+            <div className="auth-form">
 
-            <form onSubmit={handleSubmit}>
+                <div style={{textAlign: 'center', marginBottom: '32px'}}>
+                    <h2 style={{fontSize: '1.8rem', fontWeight: '700', marginBottom: '8px'}}>Create Account</h2>
+                    <p style={{color: '#717171'}}>Join our community today</p>
+                </div>
 
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    className="
-                    form-control
-                    mb-3
-                    "
-                    onChange={handleChange}
-                />
+                {error && (
+                    <div style={{
+                        background: '#FFE5E5',
+                        color: '#C5192D',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        marginBottom: '16px',
+                        fontSize: '0.85rem'
+                    }}>
+                        {error}
+                    </div>
+                )}
 
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    className="
-                    form-control
-                    mb-3
-                    "
-                    onChange={handleChange}
-                />
+                <form onSubmit={handleSubmit}>
 
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    className="
-                    form-control
-                    mb-3
-                    "
-                    onChange={handleChange}
-                />
+                    <Form.Group className="mb-3">
+                        <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Full Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="name"
+                            placeholder="John Doe"
+                            onChange={handleChange}
+                            value={formData.name}
+                            required
+                        />
+                    </Form.Group>
 
-                <select
-                    name="role"
-                    className="
-                    form-control
-                    mb-3
-                    "
-                    onChange={handleChange}
-                >
+                    <Form.Group className="mb-3">
+                        <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Email</Form.Label>
+                        <Form.Control
+                            type="email"
+                            name="email"
+                            placeholder="your@email.com"
+                            onChange={handleChange}
+                            value={formData.email}
+                            required
+                        />
+                    </Form.Group>
 
-                    <option value="tenant">
-                        Tenant
-                    </option>
+                    <Form.Group className="mb-3">
+                        <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            name="password"
+                            placeholder="••••••••"
+                            onChange={handleChange}
+                            value={formData.password}
+                            required
+                        />
+                    </Form.Group>
 
-                    <option value="owner">
-                        Owner
-                    </option>
+                    <Form.Group className="mb-4">
+                        <Form.Label style={{fontWeight: '600', marginBottom: '8px'}}>Account Type</Form.Label>
+                        <Form.Select
+                            name="role"
+                            onChange={handleChange}
+                            value={formData.role}
+                        >
 
-                </select>
+                            <option value="tenant">
+                                Tenant (Looking to rent)
+                            </option>
 
-                <button
-                    className="custom-btn"
-                >
-                    Register
-                </button>
+                            <option value="owner">
+                                Owner (Listing properties)
+                            </option>
 
-            </form>
+                        </Form.Select>
+                    </Form.Group>
+
+                    <button
+                        type="submit"
+                        className="custom-btn w-100"
+                        style={{
+                            padding: '12px',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            marginBottom: '16px'
+                        }}
+                        disabled={loading}
+                    >
+                        {loading ? 'Creating Account...' : 'Sign Up'}
+                    </button>
+
+                </form>
+
+                <div style={{textAlign: 'center', color: '#717171'}}>
+                    Already have an account? <Link to="/login" style={{color: '#FF385C', fontWeight: '600', textDecoration: 'none'}}>Sign in</Link>
+                </div>
+
+            </div>
 
         </div>
 

@@ -3,14 +3,12 @@ import {
     useNavigate
 } from "react-router-dom";
 
-import logo from "../assets/logo.webp";
-
-
 import {
     Navbar,
     Nav,
     Container,
-    Button
+    Button,
+    Form
 } from "react-bootstrap";
 
 function NavigationBar() {
@@ -23,7 +21,7 @@ function NavigationBar() {
     const logout = () => {
 
         localStorage.removeItem("token");
-
+        localStorage.removeItem("user");
         navigate("/login");
 
     };
@@ -33,7 +31,7 @@ function NavigationBar() {
         <Navbar
             expand="lg"
             className="custom-navbar"
-            variant="dark"
+            sticky="top"
         >
 
             <Container>
@@ -43,14 +41,14 @@ function NavigationBar() {
                     to="/"
                     className="fw-bold"
                 >
-                    Housetify
+                    🏠 Housetify
                 </Navbar.Brand>
 
                 <Navbar.Toggle />
 
-                <Navbar.Collapse>
+                <Navbar.Collapse className="justify-content-between">
 
-                    <Nav className="me-auto">
+                    <Nav className="me-auto ms-5">
 
                         <Nav.Link
                             as={Link}
@@ -66,14 +64,14 @@ function NavigationBar() {
                                     as={Link}
                                     to="/add-property"
                                 >
-                                    Add Property
+                                    Host
                                 </Nav.Link>
 
                                 <Nav.Link
                                     as={Link}
                                     to="/my-bookings"
                                 >
-                                    My Bookings
+                                    Trips
                                 </Nav.Link>
 
                                 <Nav.Link
@@ -88,41 +86,49 @@ function NavigationBar() {
 
                     </Nav>
 
-                    {!token ? (
+                    <div className="d-flex align-items-center gap-2">
 
-                        <>
-                            <Link
-                                to="/login"
-                                className="
-                                btn
-                                btn-light
-                                me-2
-                                "
+                        {!token ? (
+
+                            <>
+                                <Link
+                                    to="/login"
+                                    className="
+                                    btn
+                                    btn-sm
+                                    btn-light
+                                    me-2
+                                    "
+                                >
+                                    Login
+                                </Link>
+
+                                <Link
+                                    to="/register"
+                                    className="
+                                    custom-btn
+                                    text-decoration-none
+                                    btn-sm
+                                    "
+                                    style={{padding: "8px 20px"}}
+                                >
+                                    Sign Up
+                                </Link>
+                            </>
+
+                        ) : (
+
+                            <Button
+                                variant="outline-dark"
+                                size="sm"
+                                onClick={logout}
                             >
-                                Login
-                            </Link>
+                                Logout
+                            </Button>
 
-                            <Link
-                                to="/register"
-                                className="
-                                custom-btn
-                                text-decoration-none
-                                "
-                            >
-                                Register
-                            </Link>
-                        </>
+                        )}
 
-                    ) : (
-
-                        <Button
-                            variant="dark"
-                            onClick={logout}
-                        >
-                            Logout
-                        </Button>
-
-                    )}
+                    </div>
 
                 </Navbar.Collapse>
 

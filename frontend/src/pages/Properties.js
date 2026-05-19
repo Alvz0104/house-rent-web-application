@@ -13,7 +13,8 @@ import {
     Row,
     Col,
     Card,
-    Form
+    Form,
+    Container
 } from "react-bootstrap";
 
 function Properties() {
@@ -26,6 +27,9 @@ function Properties() {
 
     const [maxPrice, setMaxPrice] =
     useState("");
+
+    const [wishlist, setWishlist] =
+    useState(new Set());
 
     useEffect(() => {
 
@@ -51,126 +55,185 @@ function Properties() {
 
     };
 
+    const toggleWishlist = (id) => {
+        const newWishlist = new Set(wishlist);
+        if (newWishlist.has(id)) {
+            newWishlist.delete(id);
+        } else {
+            newWishlist.add(id);
+        }
+        setWishlist(newWishlist);
+    };
+
     return (
 
-        <div className="container mt-5">
+        <div className="py-5" style={{background: '#F7F7F7'}}>
 
-            <h2 className="section-title">
-                Available Properties
-            </h2>
+            <Container>
 
-            <Row className="mb-4">
+                <h2 className="section-title">
+                    Popular Stays
+                </h2>
 
-                <Col md={6}>
+                <Row className="mb-5">
 
-                    <Form.Control
-                        type="text"
-                        placeholder="Search by location"
-                        onChange={(e) =>
-                            setSearch(
-                                e.target.value
-                            )
-                        }
-                    />
+                    <Col md={6}>
 
-                </Col>
-
-                <Col md={6}>
-
-                    <Form.Control
-                        type="number"
-                        placeholder="Maximum Price"
-                        onChange={(e) =>
-                            setMaxPrice(
-                                e.target.value
-                            )
-                        }
-                    />
-
-                </Col>
-
-            </Row>
-
-            <Row>
-
-                {properties
-
-                .filter((property) => {
-
-                    return (
-
-                        property.location
-                        .toLowerCase()
-                        .includes(
-                            search.toLowerCase()
-                        )
-
-                        &&
-
-                        (
-                            maxPrice === "" ||
-                            property.price <= maxPrice
-                        )
-
-                    );
-
-                })
-
-                .map((property) => (
-
-                    <Col
-                        md={4}
-                        key={property._id}
-                        className="mb-4"
-                    >
-
-                        <Card className="property-card">
-
-                            <Card.Img
-                                variant="top"
-                                className="property-image"
-                                src={`http://localhost:5000/uploads/${property.image}`}
-                            />
-
-                            <Card.Body>
-
-                                <Card.Title>
-                                    {property.title}
-                                </Card.Title>
-
-                                <Card.Text>
-                                    📍 {property.location}
-                                </Card.Text>
-
-                                <Card.Text>
-                                    ₱ {property.price}
-                                </Card.Text>
-
-                                <Card.Text>
-                                    🛏 {property.bedrooms}
-                                    {" "}
-                                    Bedrooms
-                                </Card.Text>
-
-                                <Link
-                                    to={`/property/${property._id}`}
-                                    className="
-                                    custom-btn
-                                    text-decoration-none
-                                    "
-                                >
-                                    View Details
-                                </Link>
-
-                            </Card.Body>
-
-                        </Card>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search by location..."
+                            onChange={(e) =>
+                                setSearch(
+                                    e.target.value
+                                )
+                            }
+                            style={{
+                                borderRadius: '8px',
+                                padding: '12px',
+                                border: '1px solid #DDDDDD',
+                                fontSize: '0.95rem'
+                            }}
+                        />
 
                     </Col>
 
-                ))}
+                    <Col md={6}>
 
-            </Row>
+                        <Form.Control
+                            type="number"
+                            placeholder="Max Price (₱)"
+                            onChange={(e) =>
+                                setMaxPrice(
+                                    e.target.value
+                                )
+                            }
+                            style={{
+                                borderRadius: '8px',
+                                padding: '12px',
+                                border: '1px solid #DDDDDD',
+                                fontSize: '0.95rem'
+                            }}
+                        />
+
+                    </Col>
+
+                </Row>
+
+                <Row>
+
+                    {properties
+
+                    .filter((property) => {
+
+                        return (
+
+                            property.location
+                            .toLowerCase()
+                            .includes(
+                                search.toLowerCase()
+                            )
+
+                            &&
+
+                            (
+                                maxPrice === "" ||
+                                property.price <= maxPrice
+                            )
+
+                        );
+
+                    })
+
+                    .map((property) => (
+
+                        <Col
+                            md={6}
+                            lg={4}
+                            key={property._id}
+                            className="mb-4"
+                        >
+
+                            <Card className="property-card h-100">
+
+                                <div style={{position: 'relative'}}>
+                                    <Card.Img
+                                        variant="top"
+                                        className="property-image"
+                                        src={`http://localhost:5000/uploads/${property.image}`}
+                                    />
+                                    <button
+                                        onClick={() => toggleWishlist(property._id)}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '12px',
+                                            right: '12px',
+                                            background: 'white',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '36px',
+                                            height: '36px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'pointer',
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+                                            fontSize: '1.2rem',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {wishlist.has(property._id) ? '❤️' : '🤍'}
+                                    </button>
+                                </div>
+
+                                <Card.Body>
+
+                                    <div className="property-rating">
+                                        <span className="stars">★★★★★</span>
+                                        <span>(128 reviews)</span>
+                                    </div>
+
+                                    <Card.Title>
+                                        {property.title}
+                                    </Card.Title>
+
+                                    <Card.Text>
+                                        📍 {property.location}
+                                    </Card.Text>
+
+                                    <Card.Text style={{fontSize: '0.85rem', color: '#717171'}}>
+                                        🛏 {property.bedrooms} Bedrooms
+                                    </Card.Text>
+
+                                    <div className="property-price">
+                                        ₱{property.price.toLocaleString()} <span style={{fontSize: '0.75rem', color: '#717171'}}>per month</span>
+                                    </div>
+
+                                    <Link
+                                        to={`/property/${property._id}`}
+                                        className="
+                                        custom-btn
+                                        text-decoration-none
+                                        "
+                                        style={{
+                                            width: '100%',
+                                            textAlign: 'center',
+                                            display: 'block'
+                                        }}
+                                    >
+                                        View Details
+                                    </Link>
+
+                                </Card.Body>
+
+                            </Card>
+
+                        </Col>
+
+                    ))}
+
+                </Row>
+
+            </Container>
 
         </div>
 
